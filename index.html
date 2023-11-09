@@ -231,12 +231,12 @@
     };
 
     // Retrieving and displaying the user agent
-    document.getElementById('useragent').innerText = navigator.userAgent;
+    document.getElementById('useragent').innerHTML = navigator.userAgent;
 
     document.addEventListener('keydown', function(e) {
       const keycodeEnum = Object.entries(SbKey).find(([key, value]) => value === e.keyCode);
       const keyName = keycodeEnum ? keycodeEnum[0] : 'kSbKeyUnknown';
-      document.getElementById('kSbKey').innerText = "Cobalt: " + keyName;
+      document.getElementById('kSbKey').innerHTML = "Cobalt: " + keyName;
 
       document.getElementById('keycode').innerHTML = JSON.stringify({ keycode: e.keyCode, key: e.key }, null, 4);
       //window.platform.console.log("KEYDOWN" + JSON.stringify({ keycode: e.keyCode, key: e.key }));
