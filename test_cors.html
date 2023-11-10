@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rectangle Colors</title>
+    <style>
+        .rectangle {
+            width: 100px;
+            height: 50px;
+            margin: 10px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+CORS: <div class="rectangle" id="rectangle1"></div>
+
+CORS Preflight: <div class="rectangle" id="rectangle2"></div>
+
+<script>
+    function changeColorOnLoad(rectangleId) {
+        var rectangle = document.getElementById(rectangleId);
+        rectangle.style.backgroundColor = 'green';
+    }
+
+    function changeColorOnError(rectangleId) {
+        var rectangle = document.getElementById(rectangleId);
+        rectangle.style.backgroundColor = 'red';
+    }
+
+    function makeRequest(rectangleId, url, useAdditionalHeaders) {
+        var request = new XMLHttpRequest();
+
+        request.onload = function () {
+            changeColorOnLoad(rectangleId);
+        };
+
+        request.onerror = function () {
+            changeColorOnError(rectangleId);
+        };
+
+        request.open('GET', url, true);
+
+        // Add additional headers for the second rectangle
+        if (useAdditionalHeaders) {
+            request.setRequestHeader('Content-Type', 'application/json');
+            request.withCredentials = true;
+        }
+
+        request.send();
+    }
+
+    // Make requests for each rectangle
+    makeRequest('rectangle1', 'https://example.com');
+    makeRequest('rectangle2', 'https://example.com', true);
+</script>
+
+</body>
+</html>
