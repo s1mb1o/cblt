@@ -230,6 +230,13 @@
       kSbKeyGamepadRightStickRight: 0x8018,
     };
 
+    // Polyfill for Object.entries
+    if (!Object.entries) {
+      Object.entries = function(obj) {
+        return Object.keys(obj).map(key => [key, obj[key]]);
+      };
+    }
+
     // Retrieving and displaying the user agent
     document.getElementById('useragent').innerHTML = navigator.userAgent;
 
