@@ -1,0 +1,25 @@
+<html>
+  <head></head>
+  <body style="display: flex; height: 100vh; flex-direction: column; align-items: center; justify-content: center; background-color: white; color: black">
+    <h1 style="font-size: 300%">Push buttons</h1>
+    <div id="kSbKey" style="font-size: 100%"></div>
+  </body>
+  <script src="sbkey.js" defer></script>
+  <script>
+    document.addEventListener('keydown', function(e) {
+      const keycodeEnum = Object.entries(SbKey).find(([key, value]) => value === e.keyCode);
+      const keyName = keycodeEnum ? keycodeEnum[0] : 'kSbKeyUnknown';
+
+      document.getElementById('kSbKey').innerHTML += "<span style=\"color: green;\">&#x2193" + keyName + "</span> ";
+    })
+
+    document.addEventListener('keyup', function(e) {
+      const keycodeEnum = Object.entries(SbKey).find(([key, value]) => value === e.keyCode);
+      const keyName = keycodeEnum ? keycodeEnum[0] : 'kSbKeyUnknown';
+
+      document.getElementById('kSbKey').innerHTML += "<span style=\"color: red;\">&#x2191" + keyName + "</span><div></div>";
+    })
+
+
+  </script>
+</html>
