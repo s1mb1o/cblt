@@ -10,14 +10,14 @@
       const keycodeEnum = Object.entries(SbKey).find(([key, value]) => value === e.keyCode);
       const keyName = keycodeEnum ? keycodeEnum[0] : 'kSbKeyUnknown';
 
-      document.getElementById('kSbKey').innerHTML += "<span style=\"color: green;\">&#x2193" + keyName + "</span> ";
+      document.getElementById('kSbKey').innerHTML += "<span style=\"color: green;\">&#x2193;" + keyName + "</span> ";
     })
 
     document.addEventListener('keyup', function(e) {
       const keycodeEnum = Object.entries(SbKey).find(([key, value]) => value === e.keyCode);
       const keyName = keycodeEnum ? keycodeEnum[0] : 'kSbKeyUnknown';
 
-      document.getElementById('kSbKey').innerHTML += "<span style=\"color: red;\">&#x2191" + keyName + "</span><div></div>";
+      document.getElementById('kSbKey').innerHTML += "<span style=\"color: red;\">&#x2191;" + keyName + "</span><div></div>";
     })
 
 
