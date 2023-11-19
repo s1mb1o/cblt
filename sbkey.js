@@ -189,6 +189,7 @@ const SbKey = {
     kSbKeyBookmark: 0x3f04,
     kSbKeyProfile: 0x3f05,
     kSbKeyWindow: 0x3f06,
+    kSbKeyDescriptiveVideo: 0x3f07,
     kSbKeyMouse1: 0x7000,
     kSbKeyMouse2: 0x7001,
     kSbKeyMouse3: 0x7002,
