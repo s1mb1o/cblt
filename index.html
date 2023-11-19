@@ -16,10 +16,11 @@
     document.addEventListener('keydown', function(e) {
       const keycodeEnum = Object.entries(SbKey).find(([key, value]) => value === e.keyCode);
       const keyName = keycodeEnum ? keycodeEnum[0] : 'kSbKeyUnknown';
-      document.getElementById('kSbKey').innerHTML = "Cobalt: " + keyName;
 
+      console.log("KEYDOWN" + JSON.stringify({ keycode: e.keyCode, key: e.key }));
+
+      document.getElementById('kSbKey').innerHTML = "Cobalt: " + keyName;
       document.getElementById('keycode').innerHTML = JSON.stringify({ keycode: e.keyCode, key: e.key }, null, 4);
-      //window.platform.console.log("KEYDOWN" + JSON.stringify({ keycode: e.keyCode, key: e.key }));
     })
 
 
