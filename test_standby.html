@@ -4,12 +4,33 @@
     <pre id="text" style="font-size: 200%">loaded</pre>
   </body>
   <script>
+    let intervalId;
+
+    function printToConsole() {
+      if (document.visibilityState === 'hidden') {
+        console.log('Visibility State is hidden');
+      }
+    }
+
+    function startPrinting() {
+      intervalId = setInterval(printToConsole, 1000);
+    }
+
+    function stopPrinting() {
+      clearInterval(intervalId);
+    }
+
+    startPrinting();
 
     document.onvisibilitychange = function () { 
       console.log("Visible: " + !document.hidden + ", state: " + document.visibilityState); 
       document.getElementById('text').innerHTML = document.visibilityState;
 
+      if (document.visibilityState === 'visible') {
+        stopPrinting();
+      } else {
+        startPrinting();
+      }
     }
-
   </script>
 </html>
