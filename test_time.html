@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Current Local Time Logger</title>
+</head>
+<body>
+
+<h1>Current Local Time Logger</h1>
+<p id="currentTime"></p>
+
+<script>
+function displayCurrentTime() {
+    var currentTimeElement = document.getElementById("currentTime");
+    var currentTime = new Date();
+
+    // Display current time with timezone
+    var options = { timeZoneName: 'short' };
+    // var currentTimeString = 'Current Time: ' + currentTime.toLocaleTimeString('en-US', options) + ' (' + Intl.DateTimeFormat().resolvedOptions().timeZone + ')';
+    var currentTimeString = 'Current Time: ' + currentTime.toLocaleTimeString('en-US', options);
+
+    currentTimeElement.textContent = currentTimeString;
+
+    // Log the current time (you can adjust this based on your logging requirements)
+    console.log('Current Time:', currentTime.toLocaleTimeString());
+}
+
+// Display the current time initially
+displayCurrentTime();
+
+// Update the time every second
+setInterval(displayCurrentTime, 1000);
+</script>
+
+</body>
+</html>
