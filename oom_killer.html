@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Out of memory test</title>
+</head>
+<body>
+
+<script>
+    const memoryChunks = [];
+
+    function allocateMemoryChunk(sizeInMB) {
+        const bytesPerMB = 1024 * 1024;
+        const sizeInBytes = sizeInMB * bytesPerMB;
+
+        // Allocate memory using ArrayBuffer
+        const buffer = new ArrayBuffer(sizeInBytes);
+
+        // Keep a reference to the buffer to prevent it from being garbage-collected
+        memoryChunks.push(buffer);
+    }
+
+    // Allocate 1 MB in a loop
+    for (let i = 0; i < 2048; i++) {
+        try {
+            allocateMemoryChunk(1);
+            console.log(`Allocated ${i} MB of memory.`);
+        } catch(error) {
+            console.error('Memory allocation failed:', error.message);
+        }
+    }
+
+    // The memoryChunks array now holds references to all allocated buffers,
+    // preventing them from being garbage-collected.
+</script>
+
+</body>
+</html>
+
