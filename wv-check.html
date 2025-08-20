@@ -1,0 +1,27 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Widevine Level Check (webOS)</title>
+<body style="font:16px system-ui;margin:2rem">
+  <pre id="out">Checking Widevine...</pre>
+  <script>
+  async function check_wv(outputElement) {
+    const options = [{
+      initDataTypes: ['cenc'], // generic EME init data type
+      videoCapabilities: [
+        { contentType: 'video/mp4; codecs="avc1.42E01E"' },               // baseline AVC
+        { contentType: 'video/mp4; codecs="avc1.640028"', robustness: 'HW_SECURE_ALL' } // try L1
+      ]
+    }];
+    try {
+      const access = await navigator.requestMediaKeySystemAccess('com.widevine.alpha', options);
+      const cfg = access.getConfiguration();
+      const hasL1 = (cfg.videoCapabilities || []).some(c => (c.robustness||'') === 'HW_SECURE_ALL');
+      outputElement.textContent = 'Device security level: ' + (hasL1 ? 'L1' : 'L3');
+    } catch (e) {
+      outputElement.textContent = 'Widevine not available or EME blocked: ' + e;
+    }
+  }
+
+  window.onload = () => check_wv(document.getElementById('out'));
+  </script>
+</body>
