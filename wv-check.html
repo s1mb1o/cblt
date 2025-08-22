@@ -1,27 +1,66 @@
 <!doctype html>
 <meta charset="utf-8">
+
 <title>Widevine Level Check (webOS)</title>
-<body style="font:16px system-ui;margin:2rem">
+<body style="font:16px system-ui;margin:2rem;line-height:1.6">
   <pre id="out">Checking Widevine...</pre>
+  <div id="messages" style="margin-top:2rem"></div>
   <script>
-  async function check_wv(outputElement) {
-    const options = [{
-      initDataTypes: ['cenc'], // generic EME init data type
-      videoCapabilities: [
-        { contentType: 'video/mp4; codecs="avc1.42E01E"' },               // baseline AVC
-        { contentType: 'video/mp4; codecs="avc1.640028"', robustness: 'HW_SECURE_ALL' } // try L1
-      ]
-    }];
-    try {
-      const access = await navigator.requestMediaKeySystemAccess('com.widevine.alpha', options);
-      const cfg = access.getConfiguration();
-      const hasL1 = (cfg.videoCapabilities || []).some(c => (c.robustness||'') === 'HW_SECURE_ALL');
-      outputElement.textContent = 'Device security level: ' + (hasL1 ? 'L1' : 'L3');
-    } catch (e) {
-      outputElement.textContent = 'Widevine not available or EME blocked: ' + e;
-    }
+  function addMessage(text) {
+    const messagesDiv = document.getElementById('messages');
+    const messageElement = document.createElement('pre');
+    messageElement.textContent = text;
+    messageElement.style.cssText = 'margin:0.5rem 0;padding:0.5rem;background:#f0f0f0;border-left:4px solid #007acc';
+    messagesDiv.appendChild(messageElement);
   }
 
-  window.onload = () => check_wv(document.getElementById('out'));
-  </script>
+async function check_wv(outputElement) {
+	const options = [{
+		initDataTypes: [‘cenc’], // generic EME init data type
+		videoCapabilities: [
+			{ contentType: ‘video/mp4; codecs=“avc1.42E01E”’ },               // baseline AVC
+			{ contentType: ‘video/mp4; codecs=“avc1.640028”’, robustness: ‘HW_SECURE_ALL’ } // try L1
+		]
+	}];
+
+	try {
+ 		addMessage('Starting Widevine check...');
+  	addMessage('Requesting media key system access...');
+  
+  	const access = await navigator.requestMediaKeySystemAccess('com.widevine.alpha', options);
+  	const cfg = access.getConfiguration();
+  	const hasL1 = (cfg.videoCapabilities || []).some(c => (c.robustness||'') === 'HW_SECURE_ALL');
+  
+  	const result = 'Device security level: ' + (hasL1 ? 'L1' : 'L3');
+  	outputElement.textContent = result;
+  
+  	addMessage('✓ Widevine check completed successfully');
+  	addMessage('✓ ' + result);
+  	addMessage('✓ EME (Encrypted Media Extensions) is supported');
+  	addMessage('✓ Configuration: ' + JSON.stringify(cfg, null, 2));
+  
+	} catch (e) {
+  	const errorMsg = 'Widevine not available or EME blocked: ' + e;
+  	outputElement.textContent = errorMsg;
+  
+  	addMessage('✗ Widevine check failed');
+  	addMessage('✗ ' + errorMsg);
+  	addMessage('✗ This may indicate DRM is not supported on this device');
+  	addMessage('✗ Error details: ' + e.toString());
+	}
+
+	// Add some final status messages
+	addMessage('--- Test Complete ---');
+	addMessage('User Agent: ' + navigator.userAgent);
+	addMessage('Platform: ' + navigator.platform);
+	addMessage('Timestamp: ' + new Date().toISOString());
+
+}
+
+window.onload = () => {
+	addMessage(‘Page loaded, initializing Widevine test…’);
+	check_wv(document.getElementById(‘out’));
+};
+</script>
+
 </body>
