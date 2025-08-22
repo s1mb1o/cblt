@@ -1,6 +1,5 @@
 <!doctype html>
 <meta charset="utf-8">
-
 <title>Widevine Level Check (webOS)</title>
 <body style="font:16px system-ui;margin:2rem;line-height:1.6">
   <pre id="out">Checking Widevine...</pre>
@@ -14,53 +13,90 @@
     messagesDiv.appendChild(messageElement);
   }
 
-async function check_wv(outputElement) {
-	const options = [{
-		initDataTypes: [‘cenc’], // generic EME init data type
-		videoCapabilities: [
-			{ contentType: ‘video/mp4; codecs=“avc1.42E01E”’ },               // baseline AVC
-			{ contentType: ‘video/mp4; codecs=“avc1.640028”’, robustness: ‘HW_SECURE_ALL’ } // try L1
-		]
-	}];
+  async function check_wv(outputElement) {
+    addMessage('Starting DRM capability check...');
+    addMessage('Browser: ' + navigator.userAgent);
+    
+    // Check if EME is available at all
+    if (!navigator.requestMediaKeySystemAccess) {
+      const errorMsg = 'EME (Encrypted Media Extensions) not supported';
+      outputElement.textContent = errorMsg;
+      addMessage('✗ ' + errorMsg);
+      addMessage('✗ This browser does not support DRM content');
+      addMessage('--- Test Complete ---');
+      return;
+    }
+    
+    addMessage('✓ EME API is available');
+    
+    // Check Widevine support
+    const widevineOptions = [{
+      initDataTypes: ['cenc'],
+      videoCapabilities: [
+        { contentType: 'video/mp4; codecs="avc1.42E01E"' },
+        { contentType: 'video/mp4; codecs="avc1.640028"', robustness: 'HW_SECURE_ALL' }
+      ]
+    }];
+    
+    addMessage('Testing Widevine support...');
+    
+    try {
+      const access = await navigator.requestMediaKeySystemAccess('com.widevine.alpha', widevineOptions);
+      const cfg = access.getConfiguration();
+      const hasL1 = (cfg.videoCapabilities || []).some(c => (c.robustness||'') === 'HW_SECURE_ALL');
+      
+      const result = 'Widevine Level: ' + (hasL1 ? 'L1' : 'L3');
+      outputElement.textContent = result;
+      
+      addMessage('✓ Widevine is supported!');
+      addMessage('✓ ' + result);
+      addMessage('✓ Configuration: ' + JSON.stringify(cfg, null, 2));
+      
+    } catch (widevineError) {
+      addMessage('✗ Widevine not supported: ' + widevineError.name);
+      
+      // Check FairPlay (Safari's DRM)
+      addMessage('Testing FairPlay support (Safari DRM)...');
+      
+      const fairplayOptions = [{
+        initDataTypes: ['skd'],
+        videoCapabilities: [{ contentType: 'video/mp4' }]
+      }];
+      
+      try {
+        const fairplayAccess = await navigator.requestMediaKeySystemAccess('com.apple.fps', fairplayOptions);
+        const fairplayCfg = fairplayAccess.getConfiguration();
+        
+        outputElement.textContent = 'FairPlay DRM supported (Safari/Apple devices)';
+        addMessage('✓ FairPlay DRM is supported');
+        addMessage('✓ This is normal for Safari - it uses FairPlay instead of Widevine');
+        addMessage('✓ Configuration: ' + JSON.stringify(fairplayCfg, null, 2));
+        
+      } catch (fairplayError) {
+        const errorMsg = 'No DRM support detected';
+        outputElement.textContent = errorMsg;
+        addMessage('✗ FairPlay also not supported: ' + fairplayError.name);
+        addMessage('✗ ' + errorMsg);
+        addMessage('✗ Widevine error: ' + widevineError.toString());
+        addMessage('✗ FairPlay error: ' + fairplayError.toString());
+      }
+    }
+    
+    // Add system information
+    addMessage('--- Test Complete ---');
+    addMessage('Platform: ' + navigator.platform);
+    addMessage('Timestamp: ' + new Date().toISOString());
+    
+    // Force a visible update
+    setTimeout(() => {
+      addMessage('=== FINAL STATUS ===');
+      addMessage(outputElement.textContent);
+    }, 100);
+  }
 
-	try {
- 		addMessage('Starting Widevine check...');
-  	addMessage('Requesting media key system access...');
-  
-  	const access = await navigator.requestMediaKeySystemAccess('com.widevine.alpha', options);
-  	const cfg = access.getConfiguration();
-  	const hasL1 = (cfg.videoCapabilities || []).some(c => (c.robustness||'') === 'HW_SECURE_ALL');
-  
-  	const result = 'Device security level: ' + (hasL1 ? 'L1' : 'L3');
-  	outputElement.textContent = result;
-  
-  	addMessage('✓ Widevine check completed successfully');
-  	addMessage('✓ ' + result);
-  	addMessage('✓ EME (Encrypted Media Extensions) is supported');
-  	addMessage('✓ Configuration: ' + JSON.stringify(cfg, null, 2));
-  
-	} catch (e) {
-  	const errorMsg = 'Widevine not available or EME blocked: ' + e;
-  	outputElement.textContent = errorMsg;
-  
-  	addMessage('✗ Widevine check failed');
-  	addMessage('✗ ' + errorMsg);
-  	addMessage('✗ This may indicate DRM is not supported on this device');
-  	addMessage('✗ Error details: ' + e.toString());
-	}
-
-	// Add some final status messages
-	addMessage('--- Test Complete ---');
-	addMessage('User Agent: ' + navigator.userAgent);
-	addMessage('Platform: ' + navigator.platform);
-	addMessage('Timestamp: ' + new Date().toISOString());
-
-}
-
-window.onload = () => {
-	addMessage(‘Page loaded, initializing Widevine test…’);
-	check_wv(document.getElementById(‘out’));
-};
-</script>
-
+  window.onload = () => {
+    addMessage('Page loaded, initializing Widevine test...');
+    check_wv(document.getElementById('out'));
+  };
+  </script>
 </body>
